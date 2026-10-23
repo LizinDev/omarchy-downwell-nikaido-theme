@@ -19,6 +19,10 @@ uses the game's original black/white/red palette.
 omarchy theme install https://github.com/LizinDev/omarchy-downwell-nikaido-theme.git
 ```
 
+Installing applies the theme right away. To switch back to it later, run
+`omarchy theme set downwell-nikaido`; to uninstall it, run
+`omarchy theme remove downwell-nikaido`.
+
 ## Palette
 
 | Role | Hex | |
@@ -147,3 +151,10 @@ never treats a symlink that way.
 ln -s ~/Projects/omarchy-downwell-nikaido-theme ~/.config/omarchy/themes/downwell-nikaido
 omarchy theme set downwell-nikaido
 ```
+
+## License
+
+The theme files and build tools are released under the [MIT License](LICENSE). Downwell,
+its name and its art belong to Moppin and Devolver Digital. This is a fan theme, not
+affiliated with or endorsed by either, and none of the game's sprites are in this
+repository.
