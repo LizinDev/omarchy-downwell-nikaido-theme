@@ -45,13 +45,14 @@ The accent and `red` (wrong-password border, error text) sit 47.0 dE apart.
 
 | File | |
 |---|---|
-| `colors.toml` | the palette, which generates 17 app configs on its own |
+| `colors.toml` | the palette, from which Omarchy generates every other app's config |
 | `hyprland.lua` | solid orange border, square corners, hard offset shadow |
 | `shell.{menu,launcher,tooltip,lock}.toml` | opaque cards, orange selection frame, darker scrim |
 | `icons.theme` | `Yaru-dark` (Yaru's own accent is orange) |
 | `backgrounds/` | see below |
 | `preview.png` | theme-switcher tile, a pixel-art palette specimen |
 | `unlock.png` | Plymouth boot splash and SDDM logo |
+| `preview-unlock.png` | the boot splash's preview, which lists the theme in `omarchy plymouth list` |
 | `chromium/extras/` | the Chromium companion's code (its art and the theme are built, see below) |
 | `tools/` | the scripts that build the backgrounds, previews, shell overrides and the Chromium theme |
 
@@ -89,15 +90,15 @@ scale them 4× on an integer pixel grid.
 
 - **`chromium/theme`**, a theme extension: the window in the game's black, the well's
   rubble rim along the top of the tab strip with bats and spiders hanging from it past
-  the last tab, and a orange edge on the selected tab, the way the game underlines what
+  the last tab, and an orange edge on the selected tab, the way the game underlines what
   is chosen. Chromium's own new tab page gets the title screen's backdrop.
 - **`chromium/extras`**, its companion "Downwell Gunboots":
   - a new tab page drawn as the game's title screen, a still: the opening backdrop's
     ledges with the hero dropping in, the logo, a clock, a search box, and your most
     visited sites as a row of icons repainted in the palette's three colors, the chosen
     one framed by the game's cursor corners and the slots left over shown as locked
-    upgrade slots. Keys: `1`–`8` open a shortcut, arrows and `Enter` choose one, `/` or
-    just typing searches.
+    upgrade slots. Keys: `1`–`8` open a shortcut (with `Shift`, in a background tab),
+    arrows and `Enter` choose one, `/` or just typing searches.
   - a toolbar popup drawn as the pause menu, each setting with an upgrade's icon: sound
     (off by default), page scrollbars, text selection, cursors, focus rings, repainted
     icons, download notices, the death screen, tab group color (off by default), the gem
@@ -108,7 +109,8 @@ scale them 4× on an integer pixel grid.
     (bookmarks, history of the last week, downloads) with folders as upgrade icons,
     prices in gems (a folder's size, a page's visits), and each item's address or
     details under its name in the game's small font. Left and right change aisle,
-    `Enter` opens, `Backspace` leaves a folder, `Home`/`End`/`PgUp`/`PgDn` jump, typing
+    `Enter` opens (`Shift` or a middle click: in a background tab, or a download's
+    folder), `Backspace` leaves a folder, `Home`/`End`/`PgUp`/`PgDn` jump, typing
     searches, and the gauge on the right can be clicked or dragged. Open it
     from the popup, Chromium's side panel menu, or a shortcut you set for "Open the
     shop" in `chrome://extensions/shortcuts`.
@@ -127,7 +129,13 @@ scale them 4× on an integer pixel grid.
   - keyboard focus rings on every site in the orange (the browser's own stay blue), and
     new tab groups in Chromium's nearest color to it, when that is switched on.
 
-Everything is drawn in the game's font and sprites at a whole-number scale.
+Everything is drawn in the game's fonts and sprites at a whole-number scale.
+
+The companion asks for broad permissions because each part needs one: every site (the
+scrollbars, cursors, selection and focus rings), bookmarks, history and downloads (the
+shop, the gem count, download notices), navigation events (the death screen) and tab
+groups. It has no server and makes no requests of its own; everything it reads stays in
+the browser.
 
 ### Setup
 
@@ -149,13 +157,18 @@ for themes that ship a Chromium build. On any other theme the companion goes to 
 Omarchy's color policy stays, and the browser looks as Omarchy made it.
 `tools/chromium-setup remove` undoes all of it.
 
-Chromium reads a theme only when it starts. Switching from another Omarchy theme, or
-between Downwell and its sister theme, asks for a restart: the companion shows a `!`
-badge, a banner on the new tab page and a notification (`chrome://restart`).
+Chromium reads a theme, and an extension's manifest, only when it starts. Switching
+from another Omarchy theme, between Downwell and its sister theme, or to a companion
+with a new manifest (new permissions or pages after an update) asks for a restart: the
+companion shows a `!` badge, a banner on the new tab page, its state in the popup and a
+notification. `chrome://restart` reopens your tabs. On a theme without a Chromium build
+the companion's new tab page and shop are gone after that restart, too.
 
-Two things a theme extension cannot reach: focus rings and the profile button keep
-Chromium's own blue (Chromium only derives those from a seed color, which themes do
-not set), and incognito windows ignore themes altogether.
+Two things neither extension can reach: the browser's own focus rings and profile
+button keep Chromium's blue (Chromium only derives those from a seed color, which themes
+do not set; focus rings on web pages are orange), and incognito windows ignore themes
+altogether. Toolbar buttons, menus and Chromium's own pages (settings, downloads)
+can only be recolored, never redrawn.
 
 ## Caveats
 
