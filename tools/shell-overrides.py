@@ -4,17 +4,18 @@
     python3 tools/shell-overrides.py
 
 A section override REPLACES the whole generated section, so each file restates
-every key Omarchy generated and changes only the ones listed in OVERRIDES. The
-generated values are read from the live shell.toml, so apply the theme first
-(`omarchy theme set <slug>`), run this, then `omarchy theme refresh`. Re-run it
-after any change to colors.toml: the restated values are frozen hex copies.
+every key Omarchy generated and changes only the ones listed in OVERRIDES. Run
+this after editing colors.toml. It renders the installed templates from the
+palette in a temporary home so existing shell overrides cannot mask changes.
 """
+import os
 import re
-import sys
+import shutil
+import subprocess
 from pathlib import Path
+from tempfile import TemporaryDirectory
 
 THEME = Path(__file__).resolve().parent.parent
-STATE = Path.home() / '.local/state/omarchy/current'
 
 # Downwell's interface: opaque cards, a solid accent frame around the chosen
 # row (the game's selection box), and a heavier scrim.
@@ -47,6 +48,18 @@ def palette():
     return keys
 
 
+def render_stock_shell():
+    with TemporaryDirectory() as home:
+        state = Path(home) / '.local/state'
+        stage = state / 'omarchy/current/next-theme'
+        stage.mkdir(parents=True)
+        shutil.copyfile(THEME / 'colors.toml', stage / 'colors.toml')
+        env = dict(os.environ, HOME=home, XDG_STATE_HOME=str(state),
+                   OMARCHY_PATH=os.environ.get('OMARCHY_PATH', '/usr/share/omarchy'))
+        subprocess.run(['omarchy-theme-set-templates'], env=env, check=True)
+        return (stage / 'shell.toml').read_text()
+
+
 def sections(text):
     found, name = {}, None
     for line in text.splitlines():
@@ -66,12 +79,9 @@ def literal(value):
 
 
 def main():
-    slug = THEME.name.removeprefix('omarchy-').removesuffix('-theme')
-    current = (STATE / 'theme.name').read_text().strip()
-    if current != slug:
-        sys.exit(f'apply the theme first: current is {current!r}, this is {slug!r}')
+    slug = 'downwell-nikaido'
     colors = palette()
-    generated = sections((STATE / 'theme/shell.toml').read_text())
+    generated = sections(render_stock_shell())
     for section, changes in OVERRIDES.items():
         lines, done = [], set()
         for line in generated[section]:

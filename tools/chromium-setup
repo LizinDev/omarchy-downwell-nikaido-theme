@@ -85,13 +85,16 @@ if [[ ${1:-} != --no-root ]]; then
   install_root
 fi
 
-# Omarchy stages a theme's files when it is set; a build made since then is not
-# in the staged copy yet, so add it the way staging would.
-current=$(cat "$HOME/.local/state/omarchy/current/theme.name" 2>/dev/null || true)
-staged=$HOME/.local/state/omarchy/current/theme
-if [[ -n $current && -d $HOME/.config/omarchy/themes/$current/chromium && ! -d $staged/chromium ]]; then
-  cp -r "$HOME/.config/omarchy/themes/$current/chromium" "$staged/chromium"
+# Restage the active theme through Omarchy's installer rules before the hook
+# reads it. A clean clone already stages the companion sources before the art
+# and theme manifest are built. Headless refresh preserves the wallpaper and
+# skips desktop retints and hooks.
+state=$HOME/.local/state/omarchy/current
+current=$(cat "$state/theme.name" 2>/dev/null || true)
+if [[ -n $current && -f $HOME/.config/omarchy/themes/$current/chromium/theme/manifest.json ]]; then
+  OMARCHY_THEME_HEADLESS=1 omarchy-theme-refresh
 fi
+current=$(cat "$state/theme.name" 2>/dev/null || true)
 bash "$HOOK" "$current"
 echo "Folders: $DEST/{theme,extras}, in $FLAGS"
 echo "Restart Chromium (chrome://restart) to load them."

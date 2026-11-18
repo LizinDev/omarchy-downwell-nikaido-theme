@@ -186,8 +186,9 @@ switches it per theme.
 color survive (they live in `colors.toml`), but not the square corners and hard shadow.
 
 **`shell.*.toml` overrides replace their whole section.** Their hex values are frozen
-copies of `colors.toml`. After changing the palette, apply the theme, run
-`python3 tools/shell-overrides.py`, then `omarchy theme refresh`.
+copies of `colors.toml`. After changing the palette, run
+`python3 tools/shell-overrides.py`. If this theme is active, apply the result with
+`omarchy theme refresh`.
 
 ## Working on it
 
